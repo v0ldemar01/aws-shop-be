@@ -14,42 +14,31 @@ type TResponse = {
   body: string;
 };
 
-export const formatResponse200 = <S>(
-  payload: Record<string, unknown>,
-  event: ValidatedAPIGatewayProxyEvent<S>
-) => formatResponse(200, payload, event);
+export const formatResponse200 = (
+  payload: Record<string, unknown>
+) => formatResponse(200, payload);
 
-export const formatResponse400 = <S>(
-  payload: Record<string, unknown>,
-  event: ValidatedAPIGatewayProxyEvent<S>
+export const formatResponse400 = (
+  payload: Record<string, unknown>
 ) => {
-  return formatResponse(400, payload, event);
+  return formatResponse(400, payload);
 };
 
-export const formatResponse404 = <S>(
-  payload: Record<string, unknown>,
-  event: ValidatedAPIGatewayProxyEvent<S>
-) => {
-  return formatResponse(404, payload, event);
-};
+export const formatResponse404 = (
+  payload: Record<string, unknown>
+) => formatResponse(404, payload);
 
-const formatResponse = <S>(
+const formatResponse = (
   statusCode: TSupportedStatusCodes,
-  payload: Record<string, unknown>,
-  event: ValidatedAPIGatewayProxyEvent<S>
+  payload: Record<string, unknown>
 ) => {
-  const resultResponseBody = {
-    event,
-    ...payload,
-  };
-
   const result: TResponse = {
     statusCode,
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true,
     },
-    body: JSON.stringify(resultResponseBody),
+    body: JSON.stringify(payload),
   };
 
   return result;
