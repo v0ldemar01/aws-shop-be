@@ -1,0 +1,114 @@
+openapi: "3.0.0"
+info:
+  version: "1.0"
+  title: product-service
+  description: Product service Serverless API build with AWS API Gateway and Lambda
+schemes:
+  - https
+produces:
+  - application/json
+consumes:
+  - application/json
+paths:
+  /products:
+    get:
+      summary: Returns products by config
+      tags:
+        - Product
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: The number of page to skip before starting to collect the result set
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+          description: The numbers of items to return
+      responses:
+        200:
+          description: Array of product objects
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/definitions/Product"
+          headers:
+            Content-Type:
+              description: Content Type header
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              description: CORS allow origin header
+              schema:
+                type: string
+            Access-Control-Allow-Credentials:
+              description: CORS allow credentials header
+              schema:
+                type: boolean   
+        404:
+          description: Product was not found        
+  /products/{isbn}:
+    get:
+      summary: Get product by isbn
+      tags:
+        - Product
+      parameters:
+        - name: isbn
+          in: path
+          description: Product isbn
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: Product object
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/Product'
+          headers:
+            Content-Type:
+              description: Content Type header
+              schema:
+                type: string
+            Access-Control-Allow-Origin:
+              description: CORS allow origin header
+              schema:
+                type: string
+            Access-Control-Allow-Credentials:
+              description: CORS allow credentials header
+              schema:
+                type: boolean
+definitions:
+  Product:
+    properties:
+      title:
+        type: string
+      isbn:
+        type: string 
+      pageCount:
+        type: integer  
+      publishedDate: 
+        type: object 
+        properties:
+          id:
+            type: date   
+      thumbnailUrl:
+        type: string
+      shortDescription:
+        type: string
+      longDescription:
+        type: string
+      status:
+        type: string
+      authors:
+        type: array
+        items:
+          type: string
+      categories:
+        type: array
+        items:
+          type: string

@@ -1,1 +1,1 @@
-# aws-shop-be
+# aws-shop-backend
