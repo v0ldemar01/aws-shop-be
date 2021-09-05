@@ -43,5 +43,6 @@ export default {
       minItems: 1
     }
   },
-  required: ['title', 'isbn', 'authors']
+  required: ['title', 'isbn', 'pageCount', 'publishedDate', 'thumbnailUrl', 'shortDescription', 
+    'longDescription', 'status', 'authors', 'categories']
 } as const;

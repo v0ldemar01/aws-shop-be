@@ -5,6 +5,7 @@
   "main": "serverless.ts",
   "scripts": {
     "start:dev": "sls offline --httpPort 3001 start",
+    "deploy": "sls deploy",
     "test": "jest",
     "test:watch": "jest --watch"
   },

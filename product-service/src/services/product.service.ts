@@ -1,20 +1,14 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import { IGetConfig } from 'src/common/models/config/IGetConfig';
 import { IProductBook } from 'src/common/models/product/book/IProductBook';
-
-const filePath = 'data/books.json';
-
-const readAllProducts = async (): Promise<IProductBook[]> => {
-  return JSON.parse(await fs.readFile(path.resolve('src', filePath), 'utf-8'))
-};
+import bookProducts from '../mock-data/books.json'
 
 export const getProductsByConfig = async ({ page, perPage }: IGetConfig): Promise<IProductBook[]> => {
-  const bookProducts = await readAllProducts();
-  return bookProducts.slice(parseInt(page) * parseInt(perPage), parseInt(perPage) * (parseInt(page) + 1))
+  const productByConfig = bookProducts
+    .slice(parseInt(page) * parseInt(perPage), parseInt(perPage) * (parseInt(page) + 1));
+  return Promise.resolve(productByConfig as IProductBook[]);
 };
 
 export const getProductByIsbn = async (isbn: string): Promise<IProductBook> => {
-  const bookProducts = await readAllProducts();
-  return bookProducts.find(bookProduct => bookProduct.isbn === isbn);
+  const product = bookProducts.find(bookProduct => bookProduct.isbn === isbn);
+  return Promise.resolve(product as IProductBook);
 };

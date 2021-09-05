@@ -2,7 +2,7 @@ export interface IProductBook {
   title: string;
   isbn: string;
   pageCount: number;
-  publishedDate: { $date: Date }
+  publishedDate: { $date: string }
   thumbnailUrl: string;
   shortDescription: string;
   longDescription: string;
