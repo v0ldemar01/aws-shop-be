@@ -1,8 +1,9 @@
 import 'source-map-support/register';
 
-import { formatResponse200, formatResponse400, formatResponse404 } from '@libs/apiGateway';
+import { formatResponseOk, formatResponseBadRequest, formatResponseNotFound } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
+import { HttpStatusMessage } from 'src/common/enums';
 
 import * as productService from '../../services/product.service';
 
@@ -10,15 +11,15 @@ const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   const { pathParameters: { isbn } } = event;
   try {
     if (!isbn) {
-      return formatResponse400({ status: 'BadRequest', message: 'Parameter id is not specified' });
+      return formatResponseBadRequest({ status: HttpStatusMessage.BAD_REQUEST, message: 'Parameter id is not specified' });
     }
     const product = await productService.getProductByIsbn(isbn);
     if (!product) {
-      return formatResponse404({ status: 'NotFound', message: 'Book is not found' });
+      return formatResponseNotFound({ status: HttpStatusMessage.NOT_FOUND, message: 'Book is not found' });
     }
-    return formatResponse200(product as any);
+    return formatResponseOk(product as any);
   } catch (err) {
-    return formatResponse400({ status: 'BadRequest', message: err.message });
+    return formatResponseNotFound({ status: HttpStatusMessage.BAD_REQUEST, message: err.message });
   }  
 }
 

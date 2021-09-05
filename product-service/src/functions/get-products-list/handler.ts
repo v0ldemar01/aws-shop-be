@@ -1,6 +1,6 @@
 import 'source-map-support/register';
 
-import { formatResponse200, formatResponse400, formatResponse404 } from '@libs/apiGateway';
+import { formatResponseOk, formatResponseBadRequest, formatResponseNotFound } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
 import { IGetConfig } from 'src/common/models/config/IGetConfig';
@@ -12,11 +12,11 @@ const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   try {
     const products = await productService.getProductsByConfig(queryStringParameters as IGetConfig);
     if (!products) {
-      return formatResponse404({ status: 'NotFound', message: 'Books is not found' });
+      return formatResponseNotFound({ status: 'NotFound', message: 'Books is not found' });
     }
-    return formatResponse200(products as any);
+    return formatResponseOk(products as any);
   } catch (err) {
-    return formatResponse400({ status: 'BadRequest', message: err.message });
+    return formatResponseBadRequest({ status: 'BadRequest', message: err.message });
   }  
 }
 

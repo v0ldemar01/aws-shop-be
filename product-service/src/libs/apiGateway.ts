@@ -1,5 +1,6 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from "aws-lambda"
-import type { FromSchema } from "json-schema-to-ts";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from 'aws-lambda'
+import type { FromSchema } from 'json-schema-to-ts';
+import { HttpStatusCode } from 'src/common/enums';
 
 type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEvent, 'body'> & { body: FromSchema<S> }
 export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<ValidatedAPIGatewayProxyEvent<S>, APIGatewayProxyResult>
@@ -14,19 +15,19 @@ type TResponse = {
   body: string;
 };
 
-export const formatResponse200 = (
+export const formatResponseOk = (
   payload: Record<string, unknown>
-) => formatResponse(200, payload);
+) => formatResponse(HttpStatusCode.OK, payload);
 
-export const formatResponse400 = (
+export const formatResponseBadRequest = (
   payload: Record<string, unknown>
 ) => {
-  return formatResponse(400, payload);
+  return formatResponse(HttpStatusCode.BAD_REQUEST, payload);
 };
 
-export const formatResponse404 = (
+export const formatResponseNotFound = (
   payload: Record<string, unknown>
-) => formatResponse(404, payload);
+) => formatResponse(HttpStatusCode.NOT_FOUND, payload);
 
 const formatResponse = (
   statusCode: TSupportedStatusCodes,
