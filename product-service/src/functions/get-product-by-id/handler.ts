@@ -3,7 +3,7 @@ import 'source-map-support/register';
 import { formatResponseOk, formatResponseBadRequest, formatResponseNotFound } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
-import { HttpStatusMessage } from 'src/common/enums';
+import { HttpStatusMessage } from '../../common/enums';
 
 import * as productService from '../../services/product.service';
 
@@ -21,6 +21,6 @@ const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   } catch (err) {
     return formatResponseNotFound({ status: HttpStatusMessage.BAD_REQUEST, message: err.message });
   }  
-}
+};
 
-export const getProductById = middyfy(handler);
+export const getProductByIsbn = middyfy(handler);
