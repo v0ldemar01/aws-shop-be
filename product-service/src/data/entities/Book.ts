@@ -1,8 +1,9 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, RelationId } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToOne, RelationId } from 'typeorm';
 import { AbstractEntity } from '../abstract/AbstractEntity';
 import { Author } from './Author';
 import { Category } from './Category';
 import { Status } from './Status';
+import { Stock } from './Stock';
 
 @Entity()
 export class Book extends AbstractEntity {
@@ -24,6 +25,9 @@ export class Book extends AbstractEntity {
   @Column({ nullable: true })
   publishedDate: Date;
 
+  @Column()
+  price: number;
+
   @RelationId((book: Book) => book.status)
   @Column()
   readonly statusId: string;
@@ -40,4 +44,7 @@ export class Book extends AbstractEntity {
   @ManyToMany(() => Category, category => category.books)
   @JoinTable()
   categories: Category[];
+
+  @OneToOne(() => Stock, (stock) => stock.book, { onDelete: 'CASCADE' })
+  stock: Stock;
 }

@@ -11,6 +11,7 @@ export class BookSeeder {
     const status = await Status.find();
     for (const book of books) {
       await Object.assign(new Book(), book, {
+        price: Math.floor(Math.random() * 50),
         status: status.find(({ name }) => name === book.status) || status[0],
         authors: book.authors.map(authorName => authors.find(({ fullName }) => fullName === authorName)),
         categories: book.categories.map(categoryName => categories.find(({ name }) => name === categoryName))
