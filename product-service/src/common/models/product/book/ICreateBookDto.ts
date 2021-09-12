@@ -1,8 +1,7 @@
-export interface IProductBook {
+export interface ICreateBookDto {
   title: string;
-  isbn: string;
   pageCount: number;
-  publishedDate: { $date: string }
+  publishedDate: Date;
   thumbnailUrl: string;
   shortDescription: string;
   longDescription: string;

@@ -1,16 +1,16 @@
 import { handlerPath } from '@libs/handlerResolver';
 
 export default {
-  handler: `${handlerPath(__dirname)}/handler.getProductByIsbn`,
+  handler: `${handlerPath(__dirname)}/handler.getProductById`,
   events: [
     {
       http: {
         method: 'get',
-        path: 'products/{isbn}',
+        path: 'products/{id}',
         request: {
           parameters: {
             paths: {
-              isbn: true
+              id: true
             }
           }
         },

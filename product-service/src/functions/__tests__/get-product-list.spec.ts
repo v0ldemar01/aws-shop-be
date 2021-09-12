@@ -1,4 +1,4 @@
-import { getProductByIsbn } from '../get-product-by-id/handler';
+import { getProductByIsbn } from '../get-book-by-id/handler';
 import data from '../../mock-data/books.json';
 
 describe('Lambda getProductsList function', () => {

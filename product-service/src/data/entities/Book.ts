@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToOne, RelationId } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToOne } from 'typeorm';
 import { AbstractEntity } from '../abstract/AbstractEntity';
 import { Author } from './Author';
 import { Category } from './Category';
@@ -27,10 +27,6 @@ export class Book extends AbstractEntity {
 
   @Column()
   price: number;
-
-  @RelationId((book: Book) => book.status)
-  @Column()
-  readonly statusId: string;
 
   @ManyToOne(() => Status, (status) => status.books, {
     onDelete: 'CASCADE',
