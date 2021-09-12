@@ -1,24 +1,32 @@
-import { Connection, ConnectionManager, createConnection, getConnectionManager } from 'typeorm'
+import { Pool } from 'pg';
 
-export default class Database {
-  private connectionManager: ConnectionManager
+export default class DatabaseClient {
+  private readonly pool: Pool;
 
   constructor() {
-    this.connectionManager = getConnectionManager()
+    this.pool = new Pool({
+      host: process.env.PG_HOST,
+      port: +process.env.PG_PORT,
+      user: process.env.PG_USER,
+      password: process.env.PG_PASSWORD,
+      database: process.env.PG_DATABASE,
+
+      connectionTimeoutMillis: 2000
+    });
   }
 
-  public async getConnection(): Promise<Connection> {
-    const CONNECTION_NAME = 'default';
-    let connection: Connection;
-    if (this.connectionManager.has(CONNECTION_NAME)) {
-      connection = await this.connectionManager.get(CONNECTION_NAME);
-      if (!connection.isConnected) {
-        connection = await connection.connect();
-      }
-    }
-    else {
-      connection = await createConnection();
-    }
-    return connection;
+  public async connect(): Promise<void> {
+    console.log(`Connecting to ${this.pool.database} database...`);
+    await this.pool.connect();
+  }
+
+  public async disconnect(): Promise<void> {
+    console.log(`Disconnecting from ${this.pool.database} database...`);
+    await this.pool.end();
+  }
+
+  public async execute<T = any>(query: string, parameters?: string[]): Promise<T[]> {
+    const { rows } = await this.pool.query(query, parameters);
+    return rows;
   }
 }

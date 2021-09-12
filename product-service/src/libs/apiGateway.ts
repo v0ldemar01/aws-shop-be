@@ -5,7 +5,7 @@ import { HttpStatusCode } from '../common/enums';
 type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEvent, 'body'> & { body: FromSchema<S> }
 export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<ValidatedAPIGatewayProxyEvent<S>, APIGatewayProxyResult>
 
-type TSupportedStatusCodes = 200 | 400 | 404;
+type TSupportedStatusCodes = 200 | 400 | 404 | 500;
 type TResponse = {
   statusCode: TSupportedStatusCodes;
   headers: {
@@ -21,13 +21,15 @@ export const formatResponseOk = (
 
 export const formatResponseBadRequest = (
   payload: Record<string, unknown>
-) => {
-  return formatResponse(HttpStatusCode.BAD_REQUEST, payload);
-};
+) => formatResponse(HttpStatusCode.BAD_REQUEST, payload);
 
 export const formatResponseNotFound = (
   payload: Record<string, unknown>
 ) => formatResponse(HttpStatusCode.NOT_FOUND, payload);
+
+export const formatResponseServerError = (
+  payload: Record<string, unknown>
+) => formatResponse(HttpStatusCode.INTERNAL_SERVER_ERROR, payload);
 
 const formatResponse = (
   statusCode: TSupportedStatusCodes,
