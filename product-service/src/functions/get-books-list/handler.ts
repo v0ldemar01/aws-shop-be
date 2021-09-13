@@ -11,9 +11,10 @@ import BookService from '../../services/book.service';
 import DatabaseClient from 'src/services/database.service';
 
 const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
+  console.log('event', event);
   const { queryStringParameters } = event;
-  try {
-    const client = new DatabaseClient();
+  const client = new DatabaseClient();
+  try {    
     await client.connect();
     const bookService = new BookService(client);
     const products = await bookService.getBooksByConfig(queryStringParameters as IGetConfig);
@@ -23,7 +24,9 @@ const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
     return formatResponseOk(products as any);
   } catch (err) {
     return formatResponseServerError({ status: HttpStatusMessage.INTERNAL_SERVER_ERROR, message: err.message });
-  }  
+  } finally {
+    await client.disconnect();
+  }
 }
 
 export const getProductsList = middyfy(handler);

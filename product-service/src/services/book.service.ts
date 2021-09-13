@@ -1,81 +1,22 @@
 import { compactDataArray } from 'src/common/helpers/data.helper';
 import { IGetConfig } from 'src/common/models/config/IGetConfig';
-import { IBook } from 'src/common/models/product/book/IBook';
-import { IBookDto } from 'src/common/models/product/book/IBookDto';
+import { IBook } from 'src/common/models/book/IBook';
+import { IBookDto } from 'src/common/models/book/IBookDto';
+import { ICreateBookDto } from 'src/common/models/book/ICreateBookDto';
+import { IAuthorDto } from 'src/common/models/author/IAuthorDto';
+import { ICategoryDto } from 'src/common/models/category/ICategoryDto';
+import { IStatusDto } from 'src/common/models/status/IStatusDto';
 
 import DatabaseClient from './database.service';
-
-// export default class BookService {
-//   constructor(
-//     private readonly connection: Connection
-//   ) {}
-
-//   public async getBooksByConfig({ page, perPage }: IGetConfig): Promise<Book[]> {
-//     return this.connection
-//       .getRepository(Book)
-//       .find({ 
-//         relations: ['status', 'authors', 'categories', 'stock'],
-//         take: parseInt(perPage),
-//         skip: parseInt(page) * parseInt(perPage)
-//       });
-//   }
-
-//   public async getBookById(id: string): Promise<Book> {
-//     return this.connection
-//       .getRepository(Book)
-//       .findOne({ 
-//         relations: ['status', 'authors', 'categories', 'stock'],
-//         where: {
-//           id
-//         }
-//       });
-//   }
-
-//   public async createBook(book: ICreateBookDto): Promise<string> {
-//     const currentStatus = await this.connection
-//       .getRepository(Status)
-//       .findOne({
-//         where: {
-//           name: book.status
-//         }
-//       });
-//     const currentCategories = await this.connection
-//       .getRepository(Status)
-//       .find({
-//         where: {
-//           name: In(book.categories)
-//         }
-//       });
-//     const currentAuthors = await this.connection
-//       .getRepository(Status)
-//       .find({
-//         where: {
-//           fullName: In(book.authors)
-//         }
-//       });
-//     const newBook = await this.connection
-//       .getRepository(Book)
-//       .save({
-//         ...book,
-//         status: currentStatus,
-//         categories: currentCategories,
-//         authors: currentAuthors
-//       });
-//     await this.connection
-//       .getRepository(Stock)
-//       .save({
-//         book: newBook,
-//         count: Math.floor(Math.random() * 10)
-//       });
-//     return newBook.id;
-//   }
-// }
 
 export default class BookService {
   constructor(
     private readonly dbClient: DatabaseClient
   ) {}
 
+  private generateParametersSequence = (count: number) =>
+    Array.from(Array(count), (_, index) => `$${index + 1}${count !== index + 1 ? ',' : ''}`).join(' ');
+  
   private readonly coreGetQueryBook =
     `SELECT
       "Book"."id" AS "id", 
@@ -111,7 +52,7 @@ export default class BookService {
     const booksByConfigQuery =
       `${this.coreGetQueryBook}
       WHERE "Book"."id" IN
-        (${Array.from(Array(parseInt(perPage)), (_, index) => `$${index + 1}${parseInt(perPage) !== index + 1 ? ',' : ''}`).join(' ')});`;
+        (${this.generateParametersSequence(parseInt(perPage))});`;
     const books = await this.dbClient.execute<IBook>(booksByConfigQuery, bookIds.map(({ id }) => id));
     return compactDataArray(books, ['author', 'category'], ['authors', 'categories']);
   }
@@ -124,50 +65,116 @@ export default class BookService {
     return compactDataArray(book, ['author', 'category'], ['authors', 'categories'])[0];
   }
 
-  // public async findById(id: string): Promise<Product> {
-  //   const query = `SELECT * FROM ${ProductService.table} LEFT JOIN stocks AS st ON (st.product_id = ${ProductService.table}.id) WHERE id='${id}'`;
-  //   const [product] = await this.dbClient.execute<Product>(query);
+  public async createBook(book: ICreateBookDto): Promise<string> {
+    try {
+      await this.dbClient.execute<void>('BEGIN');
+      const createBookQuery =
+        `INSERT INTO "book" (
+          "id",
+          "createdAt",
+          "updatedAt",
+          "title",
+          "shortDescription",
+          "longDescription",
+          "pageCount",
+          "thumbnailUrl",
+          "publishedDate",
+          "price",
+          "statusId"
+        ) VALUES (
+          DEFAULT,
+          DEFAULT,
+          DEFAULT,
+          $1,
+          DEFAULT,
+          $2,
+          $3,
+          $4,
+          $5,
+          $6,
+          $7
+        ) RETURNING
+        "id",
+        "createdAt",
+        "updatedAt";`;        
+      const bookAuthors = await this.getAuthorsByFullName(book.authors);
+      const bookCategories = await this.getCategoriesByName(book.categories);
+      const bookStatus = await this.getStatusByName(book.status);
+      const createdBook = await this.dbClient.execute<IBook>(createBookQuery, [...Object.values(book), bookStatus[0].id]);
+      await this.createLinkBookAuthor(bookAuthors, createdBook[0].id);
+      await this.createLinkBookCategory(bookCategories, createdBook[0].id);
+      await this.createStock(createdBook[0].id, book.count)
+      await this.dbClient.execute<void>('COMMIT');
+      return createdBook[0].id;
+    } catch (err) {
+      await this.dbClient.execute('ROLLBACK');
+      throw err;
+    }    
+  }
 
-  //   return product;
-  // }
+  private async getAuthorsByFullName(fullNames: string[]) {
+    const getBookAuthorsQuery =
+      `SELECT 
+        "Author"."id" AS "id", 
+        "Author"."fullName" AS "fullName"
+      FROM "author" "Author"
+      WHERE "Author"."fullName" IN
+        (${this.generateParametersSequence(fullNames.length)});`;
+    return this.dbClient.execute<IAuthorDto>(getBookAuthorsQuery, fullNames);
+  }
 
-  // public async createStockProduct(data: Product): Promise<string> {
-  //   let productId: string;
-  //   await this.dbClient.execute('BEGIN');
+  private async getCategoriesByName(names: string[]) {
+    const getBookCategoriesQuery =
+      `SELECT 
+        "Category"."id" AS "id", 
+        "Category"."name" AS "name"
+      FROM "category" "Category"
+      WHERE "category"."name" IN
+        (${this.generateParametersSequence(names.length)});`;
+    return this.dbClient.execute<ICategoryDto>(getBookCategoriesQuery, names);
+  }
 
-  //   try {
-  //     productId = await this.createProduct(data);
-  //     await this.createStock(productId);
+  private async getStatusByName(name: string) {
+    const getBookStatusQuery =
+      `SELECT 
+        "Status"."id" AS "id", 
+        "Status"."name" AS "name"
+      FROM "status" "Status"
+      WHERE "status"."name" = ($1)`;
+    return this.dbClient.execute<IStatusDto>(getBookStatusQuery, [name]);
+  }
 
-  //     await this.dbClient.execute('COMMIT');
-  //   } catch (error) {
-  //     console.log(error);
+  private async createLinkBookAuthor(bookAuthors: IAuthorDto[], bookId: string) {
+    const linkQuery =
+      `INSERT INTO "book_authors_author" (
+        "bookId",
+        "authorId"
+      ) VALUES (
+        $1,
+        $2
+      );`;
+    for (const bookAuthor of bookAuthors) {
+      await this.dbClient.execute<void>(linkQuery, [bookId, bookAuthor.id]);
+    }
+  }
 
-  //     await this.dbClient.execute('ROLLBACK');
-  //     throw new Error(error.message);
-  //   }
+  private async createLinkBookCategory(bookCategories: ICategoryDto[], bookId: string) {
+    const linkQuery =
+      `INSERT INTO "book_categories_category" (
+        "bookId",
+        "categoryId"
+      ) VALUES (
+        $1,
+        $2
+      );`;
+    for (const bookCategory of bookCategories) {
+      await this.dbClient.execute<void>(linkQuery, [bookId, bookCategory.id]);
+    }
+  }
 
-  //   return productId;
-  // }
-
-  // private async createProduct(data: Product): Promise<string> {
-  //   const fields = ['title', 'artists', 'coveruri', 'type', 'duration', 'price', 'discount', 'releasedate', 'genre', 'lyrics'];
-  //   const query = `
-  //     INSERT INTO ${ProductService.table}
-  //       (${fields.map(f => `"${f}"`).join(', ')})
-  //     VALUES
-  //       (${fields.map(f => val(data[f] as any)).join(', ')})
-  //     RETURNING
-  //       "id"
-  //   `;
-
-  //   const [{ id }] = await this.dbClient.execute<{ id: string }>(query);
-  //   return id;
-  // }
-
-  // private async createStock(productId: string, count = 1): Promise<void> {
-  //   const query = `INSERT INTO stocks ("product_id", "count") VALUES ('${productId}', ${count})`;
-  //   await this.dbClient.execute<{ id: string }>(query);
-  // }
+  private async createStock(bookId: string, count): Promise<void> {
+    const query = `INSERT INTO stocks ("book_id", "count") VALUES ('${bookId}', ${count})`;
+    await this.dbClient.execute<void>(query);
+  }
 }
 

@@ -1,4 +1,4 @@
-import { getProductByIsbn } from '../get-book-by-id/handler';
+import { getProductById } from '../get-book-by-id/handler';
 import data from '../../mock-data/books.json';
 
 describe('Lambda getProductsList function', () => {
@@ -9,7 +9,7 @@ describe('Lambda getProductsList function', () => {
       queryStringParameters: {},
     };
 
-    const res = await getProductByIsbn(event, null, () => {});
+    const res = await getProductById(event, null, () => {});
     const receivedData = JSON.parse((res as any).body);
 
     expect(res).toBeDefined();
@@ -24,7 +24,7 @@ describe('Lambda getProductsList function', () => {
       queryStringParameters: {},
     };
 
-    const res = await getProductByIsbn(event, null, () => {});
+    const res = await getProductById(event, null, () => {});
     const { statusCode } = JSON.parse((res as any).body) || {};
 
     expect(statusCode).toBe(400);

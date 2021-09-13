@@ -10,12 +10,13 @@ import BookService from '../../services/book.service';
 import DatabaseClient from 'src/services/database.service';
 
 const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
+  console.log('event', event);
   const { pathParameters: { id } } = event;
+  const client = new DatabaseClient();
   try {
     if (!id) {
       return formatResponseBadRequest({ status: HttpStatusMessage.BAD_REQUEST, message: 'Parameter id is not specified' });
-    }
-    const client = new DatabaseClient();
+    }    
     await client.connect();
     const bookService = new BookService(client);
     const product = await bookService.getBookById(id);
@@ -25,7 +26,9 @@ const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
     return formatResponseOk(product as any);
   } catch (err) {
     return formatResponseServerError({ status: HttpStatusMessage.INTERNAL_SERVER_ERROR, message: err.message });
-  }  
+  } finally {
+    await client.disconnect();
+  }
 };
 
 export const getProductById = middyfy(handler);
