@@ -12,9 +12,9 @@ consumes:
 paths:
   /products:
     get:
-      summary: Returns products by config
+      summary: Returns books by config
       tags:
-        - Product
+        - Book
       parameters:
         - in: query
           name: page
@@ -28,13 +28,13 @@ paths:
           description: The numbers of items to return
       responses:
         200:
-          description: Array of product objects
+          description: Array of book objects
           content:
             application/json:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/definitions/Product"
+                  $ref: "#/definitions/Book"
           headers:
             Content-Type:
               description: Content Type header
@@ -48,27 +48,49 @@ paths:
               description: CORS allow credentials header
               schema:
                 type: boolean   
-        404:
-          description: Product was not found        
-  /products/{isbn}:
-    get:
-      summary: Get product by isbn
+        500:
+          description: Internal server error    
+    post:
+      summary: Create a new product in DB
       tags:
-        - Product
+        - Book
+      description: Returns created product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/CreateBook'
+      responses:
+        201:
+          description: JSON object of created product
+          content:
+            application/json:
+              schema:
+                type: string
+        400:
+          description: Invalid book schema
+        500:
+          description: Internal server error
+  /products/{id}:
+    get:
+      summary: Get Book by id
+      tags:
+        - Book
       parameters:
-        - name: isbn
+        - name: id
           in: path
-          description: Product isbn
+          description: Book id
           required: true
           schema:
             type: number
       responses:
         200:
-          description: Product object
+          description: Book object
           content:
             application/json:
               schema:
-                $ref: '#/definitions/Product'
+                $ref: '#/definitions/Book'
           headers:
             Content-Type:
               description: Content Type header
@@ -82,20 +104,19 @@ paths:
               description: CORS allow credentials header
               schema:
                 type: boolean
+        404:
+          description: Book is not found  
+        500:
+          description: Internal server error
 definitions:
-  Product:
+  CreateBook:
     properties:
       title:
         type: string
-      isbn:
-        type: string 
       pageCount:
         type: integer  
       publishedDate: 
-        type: object 
-        properties:
-          id:
-            type: date   
+        type: string 
       thumbnailUrl:
         type: string
       shortDescription:
@@ -112,3 +133,38 @@ definitions:
         type: array
         items:
           type: string
+      count:
+        type: number
+      price:
+        type: number
+  Book:
+    properties:
+      id:
+        type: string 
+        format: uuid
+      title:
+        type: string      
+      pageCount:
+        type: integer  
+      publishedDate: 
+        type: string 
+      thumbnailUrl:
+        type: string
+      shortDescription:
+        type: string
+      longDescription:
+        type: string
+      status:
+        type: string
+      authors:
+        type: array
+        items:
+          type: string
+      categories:
+        type: array
+        items:
+          type: string
+      count:
+        type: number
+      price:
+        type: number
