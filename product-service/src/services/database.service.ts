@@ -10,9 +10,9 @@ export default class DatabaseClient {
       user: process.env.PG_USER,
       password: process.env.PG_PASSWORD,
       database: process.env.PG_DATABASE,
-      ssl: {
-        rejectUnauthorized: false
-      },
+      // ssl: {
+      //   rejectUnauthorized: false
+      // },
       connectionTimeoutMillis: 2000
     });
   }

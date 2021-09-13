@@ -66,6 +66,16 @@ export default class BookService {
   }
 
   public async createBook(book: ICreateBookDto): Promise<string> {
+    const { 
+      title, 
+      shortDescription, 
+      longDescription, 
+      pageCount, 
+      thumbnailUrl, 
+      publishedDate, 
+      price,
+      count 
+    } = book;
     try {
       await this.dbClient.execute<void>('BEGIN');
       const createBookQuery =
@@ -86,27 +96,41 @@ export default class BookService {
           DEFAULT,
           DEFAULT,
           $1,
-          DEFAULT,
           $2,
           $3,
           $4,
           $5,
           $6,
-          $7
+          $7,
+          $8
         ) RETURNING
         "id",
         "createdAt",
         "updatedAt";`;        
       const bookAuthors = await this.getAuthorsByFullName(book.authors);
+      console.log('bookAuthors', bookAuthors);
       const bookCategories = await this.getCategoriesByName(book.categories);
+      console.log('bookCategories', bookCategories);
       const bookStatus = await this.getStatusByName(book.status);
-      const createdBook = await this.dbClient.execute<IBook>(createBookQuery, [...Object.values(book), bookStatus[0].id]);
+      console.log('bookStatus', bookStatus, ...Object.values(book));
+      const createdBook = await this.dbClient.execute<IBook>(createBookQuery, [
+        title, 
+        shortDescription,
+        longDescription,
+        pageCount.toString(), 
+        thumbnailUrl, 
+        publishedDate, 
+        price.toString(),
+        bookStatus[0].id
+      ]);
+      console.log('createdBook', createdBook);
       await this.createLinkBookAuthor(bookAuthors, createdBook[0].id);
       await this.createLinkBookCategory(bookCategories, createdBook[0].id);
       await this.createStock(createdBook[0].id, book.count)
       await this.dbClient.execute<void>('COMMIT');
       return createdBook[0].id;
     } catch (err) {
+      console.log('err', err);
       await this.dbClient.execute('ROLLBACK');
       throw err;
     }    
@@ -129,7 +153,7 @@ export default class BookService {
         "Category"."id" AS "id", 
         "Category"."name" AS "name"
       FROM "category" "Category"
-      WHERE "category"."name" IN
+      WHERE "Category"."name" IN
         (${this.generateParametersSequence(names.length)});`;
     return this.dbClient.execute<ICategoryDto>(getBookCategoriesQuery, names);
   }
@@ -140,7 +164,7 @@ export default class BookService {
         "Status"."id" AS "id", 
         "Status"."name" AS "name"
       FROM "status" "Status"
-      WHERE "status"."name" = ($1)`;
+      WHERE "Status"."name" = ($1)`;
     return this.dbClient.execute<IStatusDto>(getBookStatusQuery, [name]);
   }
 
@@ -173,7 +197,7 @@ export default class BookService {
   }
 
   private async createStock(bookId: string, count): Promise<void> {
-    const query = `INSERT INTO stocks ("book_id", "count") VALUES ('${bookId}', ${count})`;
+    const query = `INSERT INTO "stock" ("bookId", "count") VALUES ('${bookId}', ${count})`;
     await this.dbClient.execute<void>(query);
   }
 }

@@ -4,9 +4,6 @@ export default {
     title: {
       type: 'string'
     },
-    id: {
-      type: 'string'
-    },
     pageCount: {
       type: 'number'
     },
@@ -46,6 +43,6 @@ export default {
       type: 'number'
     },
   },
-  required: ['title', 'id', 'pageCount', 'publishedDate', 'thumbnailUrl', 'shortDescription', 
+  required: ['title', 'pageCount', 'publishedDate', 'thumbnailUrl', 'shortDescription', 
     'longDescription', 'status', 'authors', 'categories', 'price', 'count']
 } as const;
