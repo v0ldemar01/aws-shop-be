@@ -6,6 +6,11 @@
   "scripts": {
     "start:dev": "sls offline --httpPort 3001 start",
     "deploy": "sls deploy",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "add-migration": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
+    "migrate": "npm run typeorm migration:run",
+    "migration-revert": "npm run typeorm migration:revert",
+    "seed": "npx ts-node ./src/data/seeders",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -16,7 +21,10 @@
     "@middy/core": "^1.5.2",
     "@middy/http-json-body-parser": "^1.5.2",
     "jest": "^27.1.0",
-    "source-map-support": "^0.5.19"
+    "pg": "^8.7.1",
+    "source-map-support": "^0.5.19",
+    "typeorm": "^0.2.37",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@serverless/typescript": "^2.23.0",

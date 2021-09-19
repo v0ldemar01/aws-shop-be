@@ -9,7 +9,9 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2020",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "esnext",
     "outDir": "lib"
   },
   "include": ["src/**/*.ts", "serverless.ts", "jest.config.ts"],

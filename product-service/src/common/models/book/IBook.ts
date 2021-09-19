@@ -1,12 +1,12 @@
-export interface IProductBook {
+export interface IBook {
+  id: string;
   title: string;
-  isbn: string;
   pageCount: number;
-  publishedDate: { $date: string }
+  publishedDate: string;
   thumbnailUrl: string;
   shortDescription: string;
   longDescription: string;
   status: string;
-  authors: string[];
-  categories: string[];
+  author: string;
+  category: string;
 }
