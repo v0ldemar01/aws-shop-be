@@ -9,7 +9,7 @@ export default {
         bucket: env.aws.s3BucketName,
         event: 's3:ObjectCreated:*',        
         rules: [{ 
-          prefix: `${env.aws.upload}/` 
+          prefix: `${env.aws.upload}` 
         }],
         existing: true,
       },

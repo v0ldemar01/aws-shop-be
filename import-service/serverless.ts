@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 import importProductsFile from '@functions/import-products-file';
+import importFileParser from '@functions/import-file-parser';
 
 const serverlessConfiguration: AWS = {
   service: 'import-service',
@@ -29,9 +30,9 @@ const serverlessConfiguration: AWS = {
     iamRoleStatements: [
       {
         Effect: 'Allow',
-        Action: 's3:ListBucket',
+        Action: 's3:*',
         Resource: [
-          'arn:aws:s3:::${env:S3_BUCKET_NAME}'
+          'arn:aws:s3:::${env:S3_BUCKET_NAME}/*'
         ]
       },
       {
@@ -43,13 +44,13 @@ const serverlessConfiguration: AWS = {
         ],
         Resource: [
           'arn:aws:s3:::${env:S3_BUCKET_NAME}/${S3_UPLOADED_FOLDER}/*',
-          'arn:aws:s3:::${env:S3_BUCKET_NAME}/parsed/*'
+          'arn:aws:s3:::${env:S3_BUCKET_NAME}/${S3_PARSED_FOLDER}/*'
         ]
       },
     ]
   },
   // import the function via paths
-  functions: { importProductsFile },
+  functions: { importProductsFile, importFileParser },
 };
 
 module.exports = serverlessConfiguration;
