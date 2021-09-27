@@ -5,7 +5,7 @@ import { HttpStatusCode } from '../../../common/enums';
 type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEvent, 'body'> & { body: FromSchema<S> }
 export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<ValidatedAPIGatewayProxyEvent<S>, APIGatewayProxyResult>
 
-type TSupportedStatusCodes = 200 | 400 | 404 | 500;
+type TSupportedStatusCodes = 200 | 204 | 400 | 404 | 500;
 type TResponse = {
   statusCode: TSupportedStatusCodes;
   headers: {
@@ -18,6 +18,8 @@ type TResponse = {
 export const formatResponseOk = (
   payload: Record<string, unknown>
 ) => formatResponse(HttpStatusCode.OK, payload);
+
+export const formatResponseNoContent = () => formatResponse(HttpStatusCode.NO_CONTENT);
 
 export const formatResponseBadRequest = (
   payload: Record<string, unknown>
@@ -33,7 +35,7 @@ export const formatResponseServerError = (
 
 const formatResponse = (
   statusCode: TSupportedStatusCodes,
-  payload: Record<string, unknown>
+  payload?: Record<string, unknown>
 ) => {
   const result: TResponse = {
     statusCode,
@@ -41,7 +43,7 @@ const formatResponse = (
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(payload ?? {}),
   };
 
   return result;

@@ -14,4 +14,23 @@ export const getSignedUrl = async (key: string) => {
     Expires: 60,
     ContentType: 'text/csv'
   });
-}
+};
+
+export const getReadableStream = (key: string) => {
+  return s3.getObject({
+    ...defaultOptions,
+    Key: key,
+  }).createReadStream();
+};
+
+export const moveObject = async (key: string) => {
+  await s3.copyObject({
+    ...defaultOptions,
+    CopySource: `${env.aws.s3BucketName}/${key}`,
+    Key: key.replace('uploaded', 'parsed')
+  }).promise();
+  await s3.deleteObject({
+    ...defaultOptions,
+    Key: key
+  }).promise();
+} 
