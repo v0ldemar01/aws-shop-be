@@ -5,7 +5,7 @@ import { formatResponseOk, formatResponseNotFound, formatResponseServerError } f
 import { middyfy } from '@libs/lambda';
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
 import { IGetConfig } from 'src/common/models/config/IGetConfig';
-import { HttpStatusMessage } from 'src/common/enums';
+import { HttpStatusMessage } from '../../../../common/enums';
 
 import BookService from '../../services/book.service';
 import DatabaseClient from 'src/services/database.service';

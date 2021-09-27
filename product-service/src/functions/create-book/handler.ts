@@ -3,7 +3,7 @@ import 'reflect-metadata';
 
 import { formatResponseOk, formatResponseServerError, ValidatedEventAPIGatewayProxyEvent, formatResponseBadRequest } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
-import { HttpStatusMessage } from 'src/common/enums';
+import { HttpStatusMessage } from '../../../../common/enums';
 
 import BookService from '../../services/book.service';
 import DatabaseClient from 'src/services/database.service';

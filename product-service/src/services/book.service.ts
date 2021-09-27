@@ -108,11 +108,8 @@ export default class BookService {
         "createdAt",
         "updatedAt";`;        
       const bookAuthors = await this.getAuthorsByFullName(book.authors);
-      console.log('bookAuthors', bookAuthors);
       const bookCategories = await this.getCategoriesByName(book.categories);
-      console.log('bookCategories', bookCategories);
       const bookStatus = await this.getStatusByName(book.status);
-      console.log('bookStatus', bookStatus, ...Object.values(book));
       const createdBook = await this.dbClient.execute<IBook>(createBookQuery, [
         title, 
         shortDescription,
