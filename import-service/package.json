@@ -1,18 +1,12 @@
 {
-  "name": "product-service",
-  "version": "1.1.0",
+  "name": "import-service",
+  "version": "1.0.0",
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
     "start:dev": "sls offline --httpPort 3001 start",
     "deploy": "sls deploy",
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "add-migration": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
-    "migrate": "npm run typeorm migration:run",
-    "migration-revert": "npm run typeorm migration:revert",
-    "seed": "npx ts-node ./src/data/seeders",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
     "node": ">=14.15.0"
@@ -20,22 +14,19 @@
   "dependencies": {
     "@middy/core": "^1.5.2",
     "@middy/http-json-body-parser": "^1.5.2",
-    "jest": "^27.1.0",
-    "pg": "^8.7.1",
-    "source-map-support": "^0.5.19",
-    "typeorm": "^0.2.37",
-    "uuid": "^8.3.2"
+    "csv-parser": "^3.0.0",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
     "@serverless/typescript": "^2.23.0",
     "@types/aws-lambda": "^8.10.71",
-    "@types/jest": "^27.0.1",
-    "@types/node": "^14.14.25",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^14.17.19",
+    "aws-sdk-mock": "^5.3.0",
     "json-schema-to-ts": "^1.5.0",
     "serverless": "^2.23.0",
-    "serverless-offline": "^8.0.0",
+    "serverless-offline": "^8.2.0",
     "serverless-webpack": "^5.3.5",
-    "ts-jest": "^27.0.5",
     "ts-loader": "^8.0.15",
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^3.9.0",
