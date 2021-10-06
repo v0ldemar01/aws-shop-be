@@ -25,6 +25,16 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      REGION: '${env:REGION}',
+      S3_BUCKET_NAME: '${env:S3_BUCKET_NAME}',
+      S3_UPLOADED_FOLDER: '${S3_UPLOADED_FOLDER}',
+      S3_PARSED_FOLDER: '${S3_PARSED_FOLDER}',
+      // SQS_CATALOG_ITEMS_QUEUE: {
+      //   Ref: 'catalogItemsQueue'
+      // },
+      // SNS_CREATE_PRODUCT_TOPIC: {
+      //   Ref: 'createProductTopic'
+      // }
     },
     lambdaHashingVersion: '20201221',
     iamRoleStatements: [
