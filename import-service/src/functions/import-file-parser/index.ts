@@ -1,15 +1,14 @@
 import { handlerPath } from '@libs/handlerResolver';
-import { env } from 'src/env';
 
 export default {
   handler: `${handlerPath(__dirname)}/handler.importFileParser`,
   events: [
     {
       s3: {
-        bucket: env.aws.s3BucketName,
+        bucket: process.env.S3_BUCKET_NAME,
         event: 's3:ObjectCreated:*',        
         rules: [{ 
-          prefix: `${env.aws.upload}` 
+          prefix: `${process.env.S3_UPLOADED_FOLDER}` 
         }],
         existing: true,
       },

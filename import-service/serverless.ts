@@ -25,6 +25,13 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      REGION: '${env:REGION}',
+      S3_BUCKET_NAME: '${env:S3_BUCKET_NAME}',
+      S3_UPLOADED_FOLDER: '${S3_UPLOADED_FOLDER}',
+      S3_PARSED_FOLDER: '${S3_PARSED_FOLDER}',
+      SQS_CATALOG_ITEMS_QUEUE: {
+        Ref: 'catalogItemsQueue'
+      }
     },
     lambdaHashingVersion: '20201221',
     iamRoleStatements: [
@@ -47,7 +54,39 @@ const serverlessConfiguration: AWS = {
           'arn:aws:s3:::${env:S3_BUCKET_NAME}/${S3_PARSED_FOLDER}/*'
         ]
       },
+      {
+        Effect: 'Allow',
+        Action: [
+          'SQS:SendMessage'
+        ],
+        Resource: [
+          {
+            'Fn::GetAtt': ['catalogItemsQueue', 'Arn'],
+          },
+        ],
+      }
     ]
+  },
+  resources: {
+    Resources: {
+      catalogItemsQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: 'catalog-items-queue',
+          ReceiveMessageWaitTimeSeconds: 20,
+        },
+      },
+    },
+    Outputs: {
+      SqsQueueArn: {
+        Value: {
+          'Fn::GetAtt': ['catalogItemsQueue', 'Arn'],
+        },
+        Export: {
+          Name: 'catalogItemsQueue',
+        },
+      },
+    },
   },
   // import the function via paths
   functions: { importProductsFile, importFileParser },

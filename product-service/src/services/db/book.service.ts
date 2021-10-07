@@ -133,6 +133,14 @@ export default class BookService {
     }    
   }
 
+  public async bulkCreateBooks(books: ICreateBookDto[]): Promise<string[]> {
+    const createdBooksId = [] as string[];
+    for (const book of books) {
+      createdBooksId.push(await this.createBook(book));
+    }
+    return createdBooksId;
+  }
+
   private async getAuthorsByFullName(fullNames: string[]) {
     const getBookAuthorsQuery =
       `SELECT 

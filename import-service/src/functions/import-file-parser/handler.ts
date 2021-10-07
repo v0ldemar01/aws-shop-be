@@ -7,13 +7,13 @@ import { HttpStatusMessage } from '../../../../common/enums';
 import { readParseFile } from 'src/services/file';
 import { moveObject } from 'src/services/s3';
 
-const handler: Handler<S3CreateEvent>  = async (event: S3CreateEvent) => {
+const handler: Handler<S3CreateEvent> = async (event: S3CreateEvent) => {
   const records: S3EventRecord[] = (event?.Records ?? [])
     .filter(({ eventName, eventSource }) => eventSource === 'aws:s3' && eventName === 'ObjectCreated:Put');  
   try {    
     for (const record of records) {
       const key = record.s3.object.key;
-      await readParseFile(key);
+      // await readParseFile(key);
       await moveObject(key);
     }
     return formatResponseNoContent();

@@ -5,8 +5,8 @@ import { formatResponseOk, formatResponseServerError, ValidatedEventAPIGatewayPr
 import { middyfy } from '@libs/lambda';
 import { HttpStatusMessage } from '../../../../common/enums';
 
-import BookService from '../../services/book.service';
-import DatabaseClient from 'src/services/database.service';
+import BookService from '../../services/db/book.service';
+import DatabaseClient from 'src/services/db/database.service';
 import schema from 'src/common/models/book/schema';
 
 const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async event => {
