@@ -3,6 +3,7 @@ import type { AWS } from '@serverless/typescript';
 import getProductsList from '@functions/get-books-list';
 import getProductById from '@functions/get-book-by-id';
 import createProduct from '@functions/create-book';
+import catalogBatchProcess from '@functions/catalog-batch-process';
 
 const serverlessConfiguration: AWS = {
   service: 'my-product-service',
@@ -19,13 +20,14 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: 'nodejs14.x',
     stage: 'dev',
-    region: 'eu-west-1',
+    region: '${env:REGION}' as AWS['provider']['region'],
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
     },    
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      REGION: '${env:REGION}',
       PG_HOST: '${env:PG_HOST}',
       PG_PORT: '${env:PG_PORT}',
       PG_USER: '${env:PG_USERNAME}',
@@ -36,9 +38,34 @@ const serverlessConfiguration: AWS = {
       }
     },
     lambdaHashingVersion: '20201221',
+    iamRoleStatements: [
+      {
+        Effect: 'Allow',
+        Action: ['sqs:ReceiveMessage'],
+        Resource: [
+          {
+            'Fn::GetAtt': ['catalogItemsQueue', 'Arn']
+            // 'Fn::ImportValue': catalogItemsQueue
+          },
+        ],
+      },
+      {
+        Effect: 'Allow',
+        Action: ['sns:Publish'],
+        Resource: {
+          Ref: 'createProductTopic',
+        },
+      },
+    ],
   },
   resources: {
     Resources: {
+      catalogItemsQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: 'catalog-items-queue'
+        },
+      },
       createProductTopic: {
         Type: 'AWS::SNS::Topic',
         Properties: {
@@ -48,7 +75,7 @@ const serverlessConfiguration: AWS = {
       SNSSubscriptionProductImportSuccess: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
-          Endpoint: 'voldemarprk2001@gmail.com@gmail.com',
+          Endpoint: 'voldemarprk2001@gmail.com',
           Protocol: 'email',
           TopicArn: {
             Ref: 'createProductTopic',
@@ -61,7 +88,7 @@ const serverlessConfiguration: AWS = {
       SNSSubscriptionProductImportFail: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
-          Endpoint: 'voldemarsec2001@gmail.com@gmail.com',
+          Endpoint: 'voldemarsec2001@gmail.com',
           Protocol: 'email',
           TopicArn: {
             Ref: 'createProductTopic',
@@ -74,7 +101,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { getProductsList, getProductById, createProduct },
+  functions: { getProductsList, getProductById, createProduct, catalogBatchProcess },
 };
 
 module.exports = serverlessConfiguration;

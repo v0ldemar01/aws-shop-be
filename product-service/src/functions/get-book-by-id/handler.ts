@@ -4,10 +4,10 @@ import 'reflect-metadata';
 import { formatResponseOk, formatResponseBadRequest, formatResponseNotFound, formatResponseServerError } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
 import { APIGatewayEvent, APIGatewayProxyHandler } from 'aws-lambda';
-import { HttpStatusMessage } from '../../common/enums';
+import { HttpStatusMessage } from '../../../../common/enums';
 
-import BookService from '../../services/book.service';
-import DatabaseClient from 'src/services/database.service';
+import BookService from '../../services/db/book.service';
+import DatabaseClient from 'src/services/db/database.service';
 
 const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent) => {
   console.log('event', event);

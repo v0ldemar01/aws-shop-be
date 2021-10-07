@@ -83,7 +83,7 @@ const serverlessConfiguration: AWS = {
           'Fn::GetAtt': ['catalogItemsQueue', 'Arn'],
         },
         Export: {
-          Name: 'catalog-items-queue',
+          Name: 'catalogItemsQueue',
         },
       },
     },

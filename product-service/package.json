@@ -4,7 +4,7 @@
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
-    "start:dev": "sls offline --httpPort 3001 start",
+    "start:dev": "sls offline --httpPort 3001 --lambdaPort 3005 start",
     "deploy": "sls deploy",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "add-migration": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
