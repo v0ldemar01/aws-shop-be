@@ -44,8 +44,7 @@ const serverlessConfiguration: AWS = {
         Action: ['sqs:ReceiveMessage'],
         Resource: [
           {
-            'Fn::GetAtt': ['catalogItemsQueue', 'Arn']
-            // 'Fn::ImportValue': catalogItemsQueue
+            'Fn::ImportValue': 'catalogItemsQueue'
           },
         ],
       },
@@ -60,12 +59,6 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      catalogItemsQueue: {
-        Type: 'AWS::SQS::Queue',
-        Properties: {
-          QueueName: 'catalog-items-queue'
-        },
-      },
       createProductTopic: {
         Type: 'AWS::SNS::Topic',
         Properties: {
